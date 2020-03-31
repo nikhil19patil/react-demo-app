@@ -1,0 +1,14 @@
+.CenterDiv {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: whitesmoke;
+}
+
+.Container {
+    height: 100vh;
+    background-color: teal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
