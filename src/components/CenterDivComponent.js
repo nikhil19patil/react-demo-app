@@ -15,8 +15,8 @@ const loginActions = {
 
 const setLoginData = param => {
     return {
-    type: loginActions.setLoginData,
-    payload: param
+        type: loginActions.setLoginData,
+        payload: param
     };
 };
 
@@ -41,8 +41,8 @@ function CenterDivComponent(props) {
     };
 
     let validationSchema = yup.object().shape({
-        email: yup.string().email('Email is invalid').required("Email is required"), 
-        password: yup.string().required('password is required'),
+        email: yup.string().email().required(), 
+        password: yup.string().required(),
     });
 
     const onSubmit = e => {
@@ -79,7 +79,7 @@ function CenterDivComponent(props) {
                         value={state.password} /> 
                 </FormGroup>
                 <FormGroup style={{display: 'flex', justifyContent: 'space-between', alignContent: 'center'}}>
-                    <Button color="primary" type="submit">Login</Button>{' '}
+                    <Button color="primary" type="submit">Login</Button>
                     <Badge href="#" color="light">Forgot Password</Badge>
                 </FormGroup>
                 <Badge href="#" color="light">Not a user? Sign in.</Badge>
