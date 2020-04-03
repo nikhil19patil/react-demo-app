@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import '../css/Main.css'
 import { Button, Form, FormGroup, Label, Input, Badge, Spinner, Container } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -55,7 +55,18 @@ function CenterDivComponent(props) {
 
     const [state, dispatch] = useReducer(loginReducer, initialState);
 
-    // useEffect
+    useEffect(() => {
+        console.log('useEffect');
+        if(state.isLoading == true) {
+            document.title = 'Loading';
+        } else if(state.token === '' && state.loginError === '') {
+            document.title = `Login`;
+        } else if(state.token !== '') {
+            document.title = 'Welcome';
+        } else if(state.error !== '') {
+            document.title = 'Error';
+        } 
+    }, [state.token, state.loginError, state.isLoading]);
 
     const onTextChange = e => {
         const { value, name } = e.target;
