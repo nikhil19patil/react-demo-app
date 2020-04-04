@@ -1,39 +1,12 @@
 import React, { useReducer, useEffect } from "react";
 import '../css/Main.css'
-import { Button, Form, FormGroup, Label, Input, Badge, Spinner, Container } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, Badge, Spinner, Container, FormFeedback } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import loginActions from '../actions/loginActions';
-import { setLoginData, updateToken, updateLoader, updateLoginError} from '../actions/loginActions';
-
-const initialState = {
-    email : 'eve.holt@reqres.in',
-    password : 'cityslicka',
-    // email: '',
-    // password: '',
-    emailError: '',
-    passwordError: '',
-    token: '',
-    loginError: '',
-    isLoading: false
-};
-
-const loginReducer = (state, action) => {
-    switch (action.type) {
-        case loginActions.setLoginData:
-            return { ...state, ...action.payload };
-        case loginActions.updateLoader:
-            return { ...state, isLoading: action.payload };
-        case loginActions.updateToken:
-            return { ...state, token: action.payload };
-        case loginActions.updateLoginError:
-            return { ...state, loginError: action.payload };
-        case loginActions.resetToLogin:
-            return initialState;
-      default:
-        return state;
-    }
-}
+import loginReducer, {initialState} from '../reducers/LoginReducer';
+import { setLoginData, updateToken, updateLoader, updateLoginError, updateEmailError,
+    updatePasswordError} from '../actions/loginActions';
 
 async function postData(url = '', data = {}) {
     const response = await fetch(url, {
@@ -51,7 +24,7 @@ async function postData(url = '', data = {}) {
     return await response.json();
   }
 
-function CenterDivComponent(props) {
+function LoginComponent(props) {
 
     const [state, dispatch] = useReducer(loginReducer, initialState);
 
@@ -79,48 +52,49 @@ function CenterDivComponent(props) {
         dispatch({type:loginActions.resetToLogin});
     };
 
-    // yup.setLocale({
-    //     String: {
-    //       email: 'Email can\'t be empty',
-    //       password: 'Password can\'t be empty'
-    //     },
-    // });
+    yup.setLocale({
+        string: {
+          email: 'Email can\'t be empty',
+          password: 'Password can\'t be empty'
+        },
+    });
 
     let validationSchema = yup.object().shape({
-        email: yup.string().email().required(), 
-        password: yup.string().required(),
+        email: yup.string().email().required("Email can\'t be empty"), 
+        password: yup.string().required("Password can\'t be empty"),
     });
 
     const onSubmit = e => {
         e.preventDefault();
+       
         const postBody = {};
         var formData = new FormData(e.target);
         postBody.email = formData.get('email');
-        postBody.password = formData.get('password')
-        validationSchema.isValid(postBody).then(isValid => {
-            // alert("Is login data valid: " + isValid + 
-            // "\nEmail: " + ((state.email == '') ? " required" : state.email) +
-            //  "\nPassword: " + ((state.password == '') ? " required" : state.password));
-            if(isValid) {
-                dispatch(updateLoader(true));
-                postData('https://reqres.in/api/login', postBody)
-                .then((data) => {
-                    dispatch(updateLoader(false));
-                    console.log(data);
-                    if('error' in data) {
-                        dispatch(updateLoginError(data.error));
-                    } else {
-                        dispatch(updateToken(data.token));
-                    }
-                });
-            } else {
+        postBody.password = formData.get('password');
 
-            }
+        validationSchema.validate(postBody, {abortEarly: false}).catch((err) => {
+            err.inner.forEach(element => {
+                console.log(element);
+                if(element.path === 'email') {
+                    dispatch(updateEmailError(element.message));
+                } else if(element.path === 'password') {
+                    dispatch(updatePasswordError(element.message));
+                }                 
+            });
+        }).then(function(data) {
+            // console.log(data);
+            dispatch(updateLoader(true));
+            postData('https://reqres.in/api/login', postBody)
+            .then((data) => {
+                dispatch(updateLoader(false));
+                console.log(data);
+                if('error' in data) {
+                    dispatch(updateLoginError(data.error));
+                } else {
+                    dispatch(updateToken(data.token));
+                }
+            });
         });
-        // validationSchema.validate(state).catch(function(err) {
-        //     console.log(err.name);
-        //     console.log(err.errors);
-        // });
     };
 
     if(state.isLoading) {
@@ -149,7 +123,9 @@ function CenterDivComponent(props) {
                             id="myEmail" 
                             placeholder="Enter your email" 
                             onChange={onTextChange}
-                            value={state.email} />                
+                            value={state.email} 
+                            invalid={state.emailError !== ''}/>  
+                        <FormFeedback>{state.emailError}</FormFeedback>           
                     </FormGroup>
                     <FormGroup>
                         <Label for="myPass">Password</Label>
@@ -159,7 +135,9 @@ function CenterDivComponent(props) {
                             id="myPass" 
                             placeholder="Enter password" 
                             onChange={onTextChange}
-                            value={state.password} /> 
+                            value={state.password}
+                            invalid={state.passwordError !== ''}/> 
+                        <FormFeedback>{state.passwordError}</FormFeedback>      
                     </FormGroup>
                     <FormGroup style={{display: 'flex', justifyContent: 'space-between', alignContent: 'center'}}>
                         <Button color="primary" type="submit">Login</Button>
@@ -180,4 +158,4 @@ function CenterDivComponent(props) {
     }
 }
 
-export default CenterDivComponent
+export default LoginComponent

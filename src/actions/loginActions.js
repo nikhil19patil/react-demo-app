@@ -1,10 +1,11 @@
 const loginActions = {
     setLoginData: "SET_LOGIN_DATA",
-    setValidationErrors: "SET_VALIDATION_ERRORS",
     updateToken: "UPDATE_TOKEN",
     setLoading: "SET_LOADING",
     updateLoginError: "UPDATE_LOGIN_ERROR",
-    resetToLogin: "RESET_TO_LOGIN"
+    resetToLogin: "RESET_TO_LOGIN",
+    updateEmailErrors: "UPDATE_EMAIL_ERROR",
+    updatePasswordErrors: "UPDATE_PASS_ERROR"
 };
 
 export const setLoginData = param => {
@@ -32,6 +33,20 @@ export const updateLoginError = error => {
     return {
         type: loginActions.updateLoginError,
         payload: error
+    };
+};
+
+export const updateEmailError = param => {
+    return {
+        type: loginActions.updateEmailErrors,
+        payload: param
+    };
+};
+
+export const updatePasswordError = param => {
+    return {
+        type: loginActions.updatePasswordErrors,
+        payload: param
     };
 };
 
