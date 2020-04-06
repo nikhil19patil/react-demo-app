@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import LoginComponent from './components/LoginComponent'
-// import Example from './components/ExampleComponent'
+// import LoginComponent from './components/LoginComponent'
+import UsersComponent from './components/UsersComponent'
 
 ReactDOM.render(
-  <LoginComponent/>,
+  <UsersComponent/>,
   document.getElementById('root')
 );
